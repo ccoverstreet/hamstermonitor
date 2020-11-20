@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 	"strconv"
+	"sync"
 	"encoding/json"
 	"net/http"
 	"io/ioutil"
@@ -19,6 +20,7 @@ var jablko types.JablkoInterface
 const activeLength = 4 * 60
 
 type hamsterMonitor struct {
+	sync.Mutex
 	id string
 	Title string
 	Source string
@@ -85,6 +87,8 @@ func (instance *hamsterMonitor) WebHandler(w http.ResponseWriter, r *http.Reques
 }
 
 func (instance *hamsterMonitor) dataDump(w http.ResponseWriter, r *http.Request) {
+	instance.Lock()
+	defer instance.Unlock()
 	var newData monitorData
 
 	log.Println("ASDASDASDAS HAMSTER")
@@ -104,10 +108,12 @@ func (instance *hamsterMonitor) dataDump(w http.ResponseWriter, r *http.Request)
 
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintln(w, `{"status": "fail", "message": "Unable to find an appropriate action."}`)
-
 }
 
 func (instance *hamsterMonitor) sendStatus(w http.ResponseWriter, r *http.Request) {
+	instance.Lock()
+	defer instance.Unlock()
+
 	curActive := 0
 	
 	if (instance.active == 1) {
