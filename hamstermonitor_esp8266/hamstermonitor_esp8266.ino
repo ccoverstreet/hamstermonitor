@@ -1,5 +1,5 @@
 #include <ESP8266WiFi.h>
-
+#include "credentials.h"
 #include <ESP8266HTTPClient.h>
 
 const int windowSize = 30;
@@ -16,7 +16,7 @@ void setup() {
   Serial.begin(9600);
   pinMode(12, INPUT);
 
-  WiFi.begin("Dungeon", "TheMovieCouncilAndADwayne");
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.println("Connecting...");
