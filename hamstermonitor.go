@@ -17,7 +17,7 @@ import (
 
 var jablko types.JablkoInterface
 
-const activeLength = 4 * 60
+const activeLength = 240
 
 type hamsterMonitor struct {
 	sync.Mutex
@@ -91,8 +91,6 @@ func (instance *hamsterMonitor) dataDump(w http.ResponseWriter, r *http.Request)
 	defer instance.Unlock()
 	var newData monitorData
 
-	log.Println("ASDASDASDAS HAMSTER")
-
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err)
@@ -104,7 +102,9 @@ func (instance *hamsterMonitor) dataDump(w http.ResponseWriter, r *http.Request)
 	}
 
 	instance.active = newData.Active
-	instance.lastActive = time.Now().Unix()
+	if instance.active == 1 {
+		instance.lastActive = time.Now().Unix()
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintln(w, `{"status": "fail", "message": "Unable to find an appropriate action."}`)
@@ -116,9 +116,7 @@ func (instance *hamsterMonitor) sendStatus(w http.ResponseWriter, r *http.Reques
 
 	curActive := 0
 	
-	if (instance.active == 1) {
-		curActive = 1
-	} else if (time.Now().Unix() - instance.lastActive < activeLength) {
+	if (time.Now().Unix() - instance.lastActive < activeLength) {
 		curActive = 1
 	}
 
