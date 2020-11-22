@@ -42,7 +42,6 @@ func Initialize(instanceId string, configData []byte, jablkoRef types.JablkoInte
 		return nil, err		
 	}
 
-	log.Println(instance)
 	instance.id = instanceId
 
 	jablko = jablkoRef
