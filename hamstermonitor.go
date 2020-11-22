@@ -18,6 +18,7 @@ import (
 var jablko types.JablkoInterface
 
 const activeLength = 240
+const storageBin = 2880
 
 type hamsterMonitor struct {
 	sync.Mutex
@@ -27,7 +28,11 @@ type hamsterMonitor struct {
 	HamsterName string
 	active int
 	lastActive int64 
+	storage [storageBin]byte
+	storageTime [storageBin]int64
+	storageCounter int
 }
+
 
 func Initialize(instanceId string, configData []byte, jablkoRef types.JablkoInterface) (types.JablkoMod, error) {
 	instance := new(hamsterMonitor)
@@ -105,6 +110,12 @@ func (instance *hamsterMonitor) dataDump(w http.ResponseWriter, r *http.Request)
 	if instance.active == 1 {
 		instance.lastActive = time.Now().Unix()
 	}
+
+	instance.storage[instance.storageCounter] = byte(instance.active) + '0'
+	instance.storageTime[instance.storageCounter] = time.Now().Unix()
+	instance.storageCounter = instance.storageCounter + 1
+
+	log.Println(instance.storage)
 
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintln(w, `{"status": "fail", "message": "Unable to find an appropriate action."}`)
