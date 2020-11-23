@@ -110,6 +110,10 @@ func (instance *hamsterMonitor) dataDump(w http.ResponseWriter, r *http.Request)
 		instance.lastActive = time.Now().Unix()
 	}
 
+	if instance.storageCounter >= storageBin {
+		instance.storageCounter = 0
+	}
+
 	instance.storage[instance.storageCounter] = byte(instance.active) + '0'
 	instance.storageTime[instance.storageCounter] = time.Now().Unix()
 	instance.storageCounter = instance.storageCounter + 1
