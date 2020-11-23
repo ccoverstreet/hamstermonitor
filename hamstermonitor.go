@@ -45,6 +45,7 @@ func Initialize(instanceId string, configData []byte, jablkoRef types.JablkoInte
 	instance.id = instanceId
 
 	jablko = jablkoRef
+	jablko.SendMessage("Hamster monitor started")
 
 	return types.StructToMod(instance), nil
 }
