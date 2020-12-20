@@ -15,7 +15,13 @@ import (
 	"github.com/ccoverstreet/Jablko/types"
 )
 
+// ---------- Module Globals ----------
+// Interface reference to MainApp
 var jablko types.JablkoInterface
+var templateCaching bool
+var cachedTemplate string
+
+// ---------- END Module Globals ----------
 
 const activeLength = 240
 const storageBin = 2880
@@ -47,6 +53,18 @@ func Initialize(instanceId string, configData []byte, jablkoRef types.JablkoInte
 	jablko = jablkoRef
 	jablko.SendMessage("Hamster monitor started")
 
+	templateCaching = !jablko.GetFlagValue("--debug-mode")
+
+	if templateCaching && cachedTemplate == "" {
+		// Load in the template if not loaded
+		templateBytes, err := ioutil.ReadFile(instance.Source + "/hamstermonitor.html")
+		if err != nil {
+			log.Println("Unable to read hamstermonitor.html")
+		}
+
+		cachedTemplate = string(templateBytes)
+	}
+
 	return types.StructToMod(instance), nil
 }
 
@@ -63,9 +81,17 @@ func (instance *hamsterMonitor) ConfigStr() ([]byte, error) {
 }
 
 func (instance *hamsterMonitor) Card(*http.Request) string {
+	instance.Lock()
+	defer instance.Unlock()
+
 	r := strings.NewReplacer("$MODULE_ID", instance.id,
+		"$MODULE_TITLE", instance.Title,
 		"$UPDATE_INTERVAL", strconv.Itoa(10), 
 		"$HAMSTER_NAME", instance.HamsterName)
+
+	if templateCaching {
+		return r.Replace(cachedTemplate)
+	}
 
 	templateBytes, err := ioutil.ReadFile(instance.Source + "/hamstermonitor.html")
 	if err != nil {
