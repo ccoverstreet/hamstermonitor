@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"fmt"
 	"strings"
 	"time"
@@ -13,6 +12,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/ccoverstreet/Jablko/types"
+	"github.com/ccoverstreet/Jablko/src/jlog"
 )
 
 // ---------- Module Globals ----------
@@ -59,7 +59,7 @@ func Initialize(instanceId string, configData []byte, jablkoRef types.JablkoInte
 		// Load in the template if not loaded
 		templateBytes, err := ioutil.ReadFile(instance.Source + "/hamstermonitor.html")
 		if err != nil {
-			log.Println("Unable to read hamstermonitor.html")
+			jlog.Errorf("Unable to read hamstermonitor.html\n")
 		}
 
 		cachedTemplate = string(templateBytes)
@@ -75,7 +75,7 @@ func (instance *hamsterMonitor) ConfigStr() ([]byte, error) {
 		return nil, err
 	}
 
-	log.Println(instance)
+	jlog.Println(instance)
 
 	return res, nil
 }
@@ -95,7 +95,7 @@ func (instance *hamsterMonitor) Card(*http.Request) string {
 
 	templateBytes, err := ioutil.ReadFile(instance.Source + "/hamstermonitor.html")
 	if err != nil {
-		log.Println("Unable to read hamstermonitor.html")
+		jlog.Errorf("Unable to read hamstermonitor.html\n")
 	}
 
 	htmlTemplate := string(templateBytes)
@@ -124,12 +124,12 @@ func (instance *hamsterMonitor) dataDump(w http.ResponseWriter, r *http.Request)
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Println(err)
+		jlog.Errorf("%v\n", err)
 	}
 
 	err = json.Unmarshal(body, &newData)
 	if err != nil {
-		log.Println(err)
+		jlog.Errorf("%v\n", err)
 	}
 
 	instance.active = newData.Active
@@ -145,7 +145,7 @@ func (instance *hamsterMonitor) dataDump(w http.ResponseWriter, r *http.Request)
 	instance.storageTime[instance.storageCounter] = time.Now().Unix()
 	instance.storageCounter = instance.storageCounter + 1
 
-	log.Println(instance.storage)
+	jlog.Println(instance.storage)
 
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintln(w, `{"status": "fail", "message": "Unable to find an appropriate action."}`)
