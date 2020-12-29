@@ -7,4 +7,5 @@ require (
 	github.com/gorilla/mux v1.8.0
 )
 
+replace github.com/ccoverstreet/hamstermonitor => ./
 replace github.com/ccoverstreet/Jablko => ../../../../Jablko
