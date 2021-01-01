@@ -21,6 +21,8 @@ var jablko types.JablkoInterface
 var templateCaching bool
 var cachedTemplate string
 
+const defaultSourcePath = "github.com/ccoverstreet/hamstermonitor-master" // Defaults to master branch
+
 // ---------- END Module Globals ----------
 
 const activeLength = 240
@@ -42,13 +44,21 @@ type hamsterMonitor struct {
 
 func Initialize(instanceId string, configData []byte, jablkoRef types.JablkoInterface) (types.JablkoMod, error) {
 	instance := new(hamsterMonitor)
+	instance.id = instanceId
+
+	if configData == nil {
+		instance.Title = "Hamster Monitor"
+		instance.Source = defaultSourcePath
+		instance.HamsterName = "Pip"
+
+		return instance
+	}
 
 	err := json.Unmarshal(configData, &instance)
 	if err != nil {
 		return nil, err		
 	}
 
-	instance.id = instanceId
 
 	jablko = jablkoRef
 	jablko.SendMessage("Hamster monitor started")
