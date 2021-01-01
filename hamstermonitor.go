@@ -51,7 +51,7 @@ func Initialize(instanceId string, configData []byte, jablkoRef types.JablkoInte
 		instance.Source = defaultSourcePath
 		instance.HamsterName = "Pip"
 
-		return instance
+		return instance, nil
 	}
 
 	err := json.Unmarshal(configData, &instance)
