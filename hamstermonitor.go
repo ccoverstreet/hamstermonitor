@@ -90,6 +90,15 @@ func (instance *hamsterMonitor) ConfigStr() ([]byte, error) {
 	return res, nil
 }
 
+func (instance *hamsterMonitor) UpdateConfig(newConfig []byte) error {
+	err := json.Unmarshal(newConfig, instance)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (instance *hamsterMonitor) Card(*http.Request) string {
 	instance.Lock()
 	defer instance.Unlock()
