@@ -8,4 +8,4 @@ require (
 )
 
 replace github.com/ccoverstreet/hamstermonitor => ./
-replace github.com/ccoverstreet/Jablko => ../../../../Jablko
+replace github.com/ccoverstreet/Jablko => ../../..
